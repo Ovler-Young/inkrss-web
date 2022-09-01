@@ -41,7 +41,7 @@ export default function Test() {
   const [secret, setsecret] = useAtom(secretAtom);
   const [hasMounted, setHasMounted] = React.useState(false);
   const [suburl, setsuburl] = useAtom(subAtom);
-  const { data } = useSWR(`https://${domain}/${secret}/feeds`);
+  const { data } = useSWR(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
   React.useEffect(() => {
     setdomain(location.host)
     setsecret(location.pathname.substring(1))
@@ -50,7 +50,7 @@ export default function Test() {
   const handledelete = async (e) => {
     e.preventDefault();
     let url = e.currentTarget.getAttribute("url");
-    const res = await fetch(`https://${domain}/${secret}/deleteitem`, {
+    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/deleteitem`, {
       method: "post",
       body: JSON.stringify({ url: url }),
     })
@@ -76,11 +76,11 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
   };
   const handlesub = async (e) => {
     e.preventDefault();
-    const res = await fetch(`https://${domain}/${secret}/subitem`, {
+    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/subitem`, {
       method: "post",
       body: JSON.stringify({ url: suburl }),
     })
@@ -106,12 +106,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
   };
   const handleActive = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://${domain}/${secret}/active`, {
+    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/active`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -140,12 +140,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
   };
   const handleTelegraph = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://${domain}/${secret}/telegraph`, {
+    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/telegraph`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -174,7 +174,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
   };
   if (!data || !hasMounted) {
     return (
@@ -188,7 +188,7 @@ export default function Test() {
       <Box w="md" maxW="100%" mx="auto" my="10">
         <Box>
           <Text fontSize="5xl" fontWeight="bold" align="center">
-            Sub Lists
+            X岛匿名版 串监视器
           </Text>
           <Text align="center" fontSize="2xl" fontWeight="bold">
             Subscribe!
@@ -198,7 +198,7 @@ export default function Test() {
               focusBorderColor={colorMode === "light" ? "black" : "white"}
               pr="4.5rem"
               value={suburl}
-              placeholder="Enter Url"
+              placeholder="输入串号"
               onChange={(e) => setsuburl(e.target.value)}
             />
             <InputRightElement width="4.5rem">
@@ -224,6 +224,10 @@ export default function Test() {
                 <Tooltip label="telegraph" placement="auto">
                   <Th>TG</Th>
                 </Tooltip>
+                <Tooltip label="ReplyCount" placement="auto">
+                  <Th>RPL</Th>
+                </Tooltip>
+                <Th>lastUpdateTime</Th>
                 <Th>delete</Th>
               </Tr>
             </Thead>
@@ -282,6 +286,8 @@ export default function Test() {
                       </Button>
                     </Tooltip>
                   </Td>
+                  <Td>{feed.ReplyCount}</Td>
+                  <Td>{feed.lastUpdateTime}</Td>
                   <Td>
                     <Popover placement="top-start" colorScheme="black">
                       <PopoverTrigger>
