@@ -41,7 +41,7 @@ export default function Test() {
   const [secret, setsecret] = useAtom(secretAtom);
   const [hasMounted, setHasMounted] = React.useState(false);
   const [suburl, setsuburl] = useAtom(subAtom);
-  const { data } = useSWR(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
+  const { data } = useSWR(`https://${domain}/${secret}/feeds`);
   React.useEffect(() => {
     setdomain(location.host)
     setsecret(location.pathname.substring(1))
@@ -76,7 +76,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
+    mutate(`https://${domain}/${secret}/feeds`);
   };
   const handlesub = async (e) => {
     e.preventDefault();
@@ -106,7 +106,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
+    mutate(`https://${domain}/${secret}/feeds`);
   };
   const handleActive = async (e) => {
     e.preventDefault();
@@ -140,7 +140,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
+    mutate(`https://${domain}/${secret}/feeds`);
   };
   const handleTelegraph = async (e) => {
     e.preventDefault();
@@ -174,7 +174,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/feeds`);
+    mutate(`https://${domain}/${secret}/feeds`);
   };
   if (!data || !hasMounted) {
     return (
@@ -225,9 +225,8 @@ export default function Test() {
                   <Th>TG</Th>
                 </Tooltip>
                 <Tooltip label="ReplyCount" placement="auto">
-                  <Th>RPL</Th>
+                  <Th isNumeric>RPL</Th>
                 </Tooltip>
-                <Th>lastUpdateTime</Th>
                 <Th>delete</Th>
               </Tr>
             </Thead>
@@ -287,7 +286,6 @@ export default function Test() {
                     </Tooltip>
                   </Td>
                   <Td>{feed.ReplyCount}</Td>
-                  <Td>{feed.lastUpdateTime}</Td>
                   <Td>
                     <Popover placement="top-start" colorScheme="black">
                       <PopoverTrigger>
