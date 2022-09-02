@@ -41,6 +41,7 @@ export default function Test() {
   const [secret, setsecret] = useAtom(secretAtom);
   const [hasMounted, setHasMounted] = React.useState(false);
   const [suburl, setsuburl] = useAtom(subAtom);
+  const [subtitle, setsubtitle] = useAtom(subAtom);
   const { data } = useSWR(`https://rssandmore.gcy.workers.dev/1/feeds`);
   React.useEffect(() => {
     setdomain(location.host)
@@ -50,7 +51,7 @@ export default function Test() {
   const handledelete = async (e) => {
     e.preventDefault();
     let url = e.currentTarget.getAttribute("url");
-    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/deleteitem`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/deleteitem`, {
       method: "post",
       body: JSON.stringify({ url: url }),
     })
@@ -80,7 +81,7 @@ export default function Test() {
   };
   const handlesub = async (e) => {
     e.preventDefault();
-    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/subitem`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/subitem`, {
       method: "post",
       body: JSON.stringify({ url: suburl }),
     })
@@ -111,7 +112,7 @@ export default function Test() {
   const handleActive = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/active`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/active`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -145,7 +146,7 @@ export default function Test() {
   const handleTelegraph = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/telegraph`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/telegraph`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -176,6 +177,40 @@ export default function Test() {
       });
     mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
+  const handleTitle = async (e) => {
+    e.preventDefault();
+    let url = e.currentTarget.getAttribute("url");
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/title`, {
+      method: "post",
+      body: JSON.stringify({
+        url: e.currentTarget.getAttribute("url"),
+        title: e.currentTarget.getAttribute("title"),
+      }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.status != 0) {
+          toast({
+            position: "bottom-right",
+            title: "Error!",
+            description: r.message,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            position: "bottom-right",
+            title: "Edit succeed!",
+            description: r.message,
+            status: "success",
+            duration: 1000,
+            isClosable: true,
+          });
+        }
+      });
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
+  };
   if (!data || !hasMounted) {
     return (
       <Box w="100%" align="center">
@@ -187,7 +222,7 @@ export default function Test() {
     <>
       <Box w="md" maxW="100%" mx="auto" my="10">
         <Box>
-          <Text fontSize="5xl" fontWeight="bold" align="center">
+          <Text fontSize="4xl" fontWeight="bold" align="center">
             X岛匿名版 串监视器
           </Text>
           <Text align="center" fontSize="2xl" fontWeight="bold">
@@ -201,7 +236,7 @@ export default function Test() {
               placeholder="输入串号"
               onChange={(e) => setsuburl(e.target.value)}
             />
-            <InputRightElement width="4.5rem">
+            <InputRightElement width="5rem">
               <Button
                 h="1.75rem"
                 size="sm"
@@ -219,20 +254,24 @@ export default function Test() {
           <Table size="xs">
             <Thead>
               <Tr>
-                <Th>active</Th>
+                <Tooltip label="active" placement="auto">
+                  <Th>act</Th>
+                </Tooltip>
                 <Th>title</Th>
                 <Tooltip label="telegraph" placement="auto">
                   <Th>TG</Th>
                 </Tooltip>
                 <Tooltip label="ReplyCount" placement="auto">
-                  <Th isNumeric>RPL</Th>
+                  <Th>RPL</Th>
                 </Tooltip>
-                <Th>delete</Th>
-              </Tr>
+                <Tooltip label="ReplyCount" placement="auto">
+                  <Th>DEL</Th>
+                </Tooltip>
+               </Tr>
             </Thead>
             <Tbody>
               {data.map((feed) => (
-                <Tr key={feed.title}>
+                <Tr key={feed.id}>
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
@@ -259,7 +298,56 @@ export default function Test() {
                     </Tooltip>
                   </Td>
                   <Td>
-                    <Link href={feed.url}>{feed.title}</Link>
+                    <Tooltip label="Click to change!" placement="auto">
+                      <Popover placement="top-start" colorScheme="black">
+                        <PopoverTrigger>
+                          <Button variant="ghost" size="xs" fontSize="s" fontWeight="light">
+                          {feed.title}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent boxShadow="black">
+                          <PopoverHeader fontWeight="semibold">
+                            Be careful!
+                          </PopoverHeader>
+                          <PopoverArrow />
+                          <PopoverCloseButton />
+                          <PopoverBody align="center">
+                            <Text>{"请重新输入" + feed.title + "的标题"}</Text>
+                            <InputGroup size="sm">
+                              <Input
+                                focusBorderColor={colorMode === "light" ? "black" : "black"}
+                                pr="2rem"
+                                placeholder="重新输入标题"
+                                value={subtitle}
+                                onChange={(e) => setsubtitle(e.target.value)}
+                              />
+                              <InputRightElement width="5rem">
+                                <Button
+                                  h="1.75rem"
+                                  size="xs"
+                                  onClick={handleTitle}
+                                  variant="outline"
+                                  colorScheme="black"
+                                >
+                                  Change
+                                </Button>
+                              </InputRightElement>
+                            </InputGroup>
+
+                            <Button
+                              my="2"
+                              variant="outline"
+                              size="sm"
+                              borderColor="black"
+                              url={feed.url}
+                              onClick={handledelete}
+                            >
+                              Confirm!
+                            </Button>
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Popover>
+                    </Tooltip>
                   </Td>
 
                   <Td>
@@ -285,11 +373,13 @@ export default function Test() {
                       </Button>
                     </Tooltip>
                   </Td>
-                  <Td>{feed.ReplyCount}</Td>
+                  <Td>
+                    <Link href={feed.url} fontSize="s" fontWeight="light">{feed.ReplyCount}</Link>
+                  </Td>
                   <Td>
                     <Popover placement="top-start" colorScheme="black">
                       <PopoverTrigger>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="xs">
                           Delete
                         </Button>
                       </PopoverTrigger>
@@ -332,7 +422,7 @@ export default function Test() {
           width="100%"
           maxWidth="md"
         >
-          <Link href="https://github.com/pureink/inkrss" isExternal>
+          <Link href="https://github.com/Ovler-Young/rssandmore" isExternal>
             <Button variant="ghost" size="sm" rightIcon={<AiFillGithub />}>
               GitHub
             </Button>
