@@ -41,7 +41,7 @@ export default function Test() {
   const [secret, setsecret] = useAtom(secretAtom);
   const [hasMounted, setHasMounted] = React.useState(false);
   const [suburl, setsuburl] = useAtom(subAtom);
-  const { data } = useSWR(`https://${domain}/${secret}/feeds`);
+  const { data } = useSWR(`https://rssandmore.gcy.workers.dev/1/feeds`);
   React.useEffect(() => {
     setdomain(location.host)
     setsecret(location.pathname.substring(1))
@@ -50,7 +50,7 @@ export default function Test() {
   const handledelete = async (e) => {
     e.preventDefault();
     let url = e.currentTarget.getAttribute("url");
-    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/deleteitem`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/deleteitem`, {
       method: "post",
       body: JSON.stringify({ url: url }),
     })
@@ -76,11 +76,11 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   const handlesub = async (e) => {
     e.preventDefault();
-    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/subitem`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/subitem`, {
       method: "post",
       body: JSON.stringify({ url: suburl }),
     })
@@ -106,12 +106,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   const handleActive = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/active`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/active`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -140,12 +140,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   const handleTelegraph = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://210d84b85e0f9b49d21a02b5dc223ed1.cloudflareworkers.com/paaath/telegraph`, {
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/paaath/telegraph`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -174,7 +174,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   if (!data || !hasMounted) {
     return (
