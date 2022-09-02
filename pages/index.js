@@ -50,10 +50,10 @@ export default function Test() {
   }, [setdomain, setsecret]);
   const handledelete = async (e) => {
     e.preventDefault();
-    let url = e.currentTarget.getAttribute("url");
+    let id = e.currentTarget.getAttribute("id");
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/deleteitem`, {
       method: "post",
-      body: JSON.stringify({ url: url }),
+      body: JSON.stringify({ id: id }),
     })
       .then((r) => r.json())
       .then((r) => {
@@ -115,7 +115,7 @@ export default function Test() {
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/active`, {
       method: "POST",
       body: JSON.stringify({
-        url: e.currentTarget.getAttribute("url"),
+        id: e.currentTarget.getAttribute("id"),
         state: e.currentTarget.getAttribute("state") === "on" ? false : true,
       }),
     })
@@ -149,7 +149,7 @@ export default function Test() {
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/telegraph`, {
       method: "POST",
       body: JSON.stringify({
-        url: e.currentTarget.getAttribute("url"),
+        id: e.currentTarget.getAttribute("id"),
         state: e.currentTarget.getAttribute("state") === "on" ? false : true,
       }),
     })
@@ -179,11 +179,11 @@ export default function Test() {
   };
   const handleTitle = async (e) => {
     e.preventDefault();
-    let url = e.currentTarget.getAttribute("url");
+    let id = e.currentTarget.getAttribute("id");
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/title`, {
       method: "post",
       body: JSON.stringify({
-        url: e.currentTarget.getAttribute("url"),
+        id: e.currentTarget.getAttribute("id"),
         title: e.currentTarget.getAttribute("title"),
       }),
     })
@@ -275,7 +275,7 @@ export default function Test() {
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
-                        url={feed.url}
+                        id={feed.id}
                         state={feed.active ? "on" : "off"}
                         variant="ghost"
                         isChecked={feed.active}
@@ -298,62 +298,52 @@ export default function Test() {
                     </Tooltip>
                   </Td>
                   <Td>
-                    <Tooltip label="Click to change!" placement="auto">
-                      <Popover placement="top-start" colorScheme="black">
-                        <PopoverTrigger>
+                    <Popover placement="top-start">
+                      <PopoverTrigger>
                           <Button variant="ghost" size="xs" fontSize="s" fontWeight="light">
-                          {feed.title}
+                            {feed.title}
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent boxShadow="black">
-                          <PopoverHeader fontWeight="semibold">
-                            Be careful!
-                          </PopoverHeader>
-                          <PopoverArrow />
-                          <PopoverCloseButton />
-                          <PopoverBody align="center">
-                            <Text>{"请重新输入" + feed.title + "的标题"}</Text>
-                            <InputGroup size="sm">
-                              <Input
-                                focusBorderColor={colorMode === "light" ? "black" : "black"}
-                                pr="2rem"
-                                placeholder="重新输入标题"
-                                value={subtitle}
-                                onChange={(e) => setsubtitle(e.target.value)}
-                              />
-                              <InputRightElement width="5rem">
-                                <Button
-                                  h="1.75rem"
-                                  size="xs"
-                                  onClick={handleTitle}
-                                  variant="outline"
-                                  colorScheme="black"
-                                >
-                                  Change
-                                </Button>
-                              </InputRightElement>
-                            </InputGroup>
-
-                            <Button
-                              my="2"
+                      </PopoverTrigger>
+                      <PopoverContent boxShadow="black">
+                        <PopoverHeader fontWeight="semibold">
+                          重命名标题！
+                        </PopoverHeader>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverBody align="center">
+                          <Text>请重新输入</Text>
+                          <Text  fontSize="xl" fontWeight="bold" align="center">{feed.title}</Text>
+                          <Text>的标题！</Text>
+                          <InputGroup size="sm">
+                            <Input
+                              focusBorderColor={colorMode === "light" ? "black" : "black"}
+                              pr="2rem"
+                              placeholder="重新输入标题"
+                              value={subtitle}
                               variant="outline"
-                              size="sm"
-                              borderColor="black"
-                              url={feed.url}
-                              onClick={handledelete}
-                            >
-                              Confirm!
-                            </Button>
-                          </PopoverBody>
-                        </PopoverContent>
-                      </Popover>
-                    </Tooltip>
+                              onChange={(e) => setsubtitle(e.target.value)}
+                            />
+                            <InputRightElement width="3.5rem" mx="0.5">
+                              <Button
+                                h="1.75rem"
+                                size="xs"
+                                onClick={handleTitle}
+                                variant="outline"
+                                colorScheme="black"
+                              >
+                                Change
+                              </Button>
+                            </InputRightElement>
+                          </InputGroup>
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
                   </Td>
 
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
-                        url={feed.url}
+                        id={feed.id}
                         state={feed.telegraph ? "on" : "off"}
                         variant="ghost"
                         isChecked={feed.telegraph}
@@ -396,7 +386,7 @@ export default function Test() {
                             variant="outline"
                             size="sm"
                             borderColor="black"
-                            url={feed.url}
+                            id={feed.id}
                             onClick={handledelete}
                           >
                             Confirm!
