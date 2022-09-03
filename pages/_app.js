@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
       <Head>
-        <title>INK RSS</title>
+        <title>Monitor</title>
       </Head>
       <Component {...pageProps} />
     </ChakraProvider>

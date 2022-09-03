@@ -21,6 +21,8 @@ import {
   Button,
   Box,
   Text,
+  PinInput,
+  PinInputField,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -50,10 +52,12 @@ export default function Test() {
   }, [setdomain, setsecret]);
   const handledelete = async (e) => {
     e.preventDefault();
+    console.log(e);
     let id = e.currentTarget.getAttribute("id");
+    const url = `https://www.nmbxd1.com/t/${id}`;
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/deleteitem`, {
       method: "post",
-      body: JSON.stringify({ id: id }),
+      body: JSON.stringify({ url: url }),
     })
       .then((r) => r.json())
       .then((r) => {
@@ -80,7 +84,7 @@ export default function Test() {
     mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   const handlesub = async (e) => {
-    e.preventDefault();
+    console.log(suburl);
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/subitem`, {
       method: "post",
       body: JSON.stringify({ url: suburl }),
@@ -115,7 +119,7 @@ export default function Test() {
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/active`, {
       method: "POST",
       body: JSON.stringify({
-        id: e.currentTarget.getAttribute("id"),
+        url: e.currentTarget.getAttribute("url"),
         state: e.currentTarget.getAttribute("state") === "on" ? false : true,
       }),
     })
@@ -149,7 +153,7 @@ export default function Test() {
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/telegraph`, {
       method: "POST",
       body: JSON.stringify({
-        id: e.currentTarget.getAttribute("id"),
+        url: e.currentTarget.getAttribute("url"),
         state: e.currentTarget.getAttribute("state") === "on" ? false : true,
       }),
     })
@@ -179,12 +183,12 @@ export default function Test() {
   };
   const handleTitle = async (e) => {
     e.preventDefault();
-    let id = e.currentTarget.getAttribute("id");
+    let url = e.currentTarget.getAttribute("url");
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/title`, {
       method: "post",
       body: JSON.stringify({
-        id: e.currentTarget.getAttribute("id"),
-        title: e.currentTarget.getAttribute("title"),
+        url: url,
+        title: suburl,
       }),
     })
       .then((r) => r.json())
@@ -228,26 +232,40 @@ export default function Test() {
           <Text align="center" fontSize="2xl" fontWeight="bold">
             Subscribe!
           </Text>
-          <InputGroup size="md" my="2">
-            <Input
-              focusBorderColor={colorMode === "light" ? "black" : "white"}
-              pr="4.5rem"
-              value={suburl}
-              placeholder="输入串号"
-              onChange={(e) => setsuburl(e.target.value)}
-            />
-            <InputRightElement width="5rem">
-              <Button
-                h="1.75rem"
-                size="sm"
-                onClick={handlesub}
-                variant="outline"
-                colorScheme="black"
-              >
-                Subscribe
-              </Button>
-            </InputRightElement>
-          </InputGroup>
+          <Box
+            w="md"
+            maxW="100%"
+            mx="auto"
+            my="3"
+            align="center"
+          >
+            <Text fontSize="md" fontWeight="light" align="center">
+              在下方输入串号
+            </Text>
+            <PinInput
+              size="md"
+              onChange={(value) => setsuburl(value) && console.log(suburl)}
+              onComplete={(value) => setsuburl(value) && console.log(suburl) && handlesub}
+              PinInput={true}
+            >
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+              <PinInputField/>
+            </PinInput>
+            <Button
+              size="md"
+              onClick={handlesub}
+              variant="outline"
+              colorScheme="black"
+            >
+              GO!
+            </Button>
+          </Box>
           <Text align="center" fontSize="2xl">
             {data.length} items
           </Text>
@@ -271,7 +289,7 @@ export default function Test() {
             </Thead>
             <Tbody>
               {data.map((feed) => (
-                <Tr key={feed.id}>
+                <Tr key={feed.url}>
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
@@ -280,18 +298,13 @@ export default function Test() {
                         variant="ghost"
                         isChecked={feed.active}
                         onClick={handleActive}
+                        url={feed.url}
                       >
                         <Box
                           w="2"
                           h="2"
                           border="1px"
-                          bg={
-                            feed.active
-                              ? colorMode === "light"
-                                ? "black"
-                                : "white"
-                              : "transparent"
-                          }
+                          bg={feed.active ? "green.500" : "red.500"}
                           borderRadius="full"
                         ></Box>
                       </Button>
@@ -330,6 +343,8 @@ export default function Test() {
                                 onClick={handleTitle}
                                 variant="outline"
                                 colorScheme="black"
+                                id={feed.id}
+                                url={feed.url}
                               >
                                 Change
                               </Button>
@@ -344,6 +359,7 @@ export default function Test() {
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
                         id={feed.id}
+                        url={feed.url}
                         state={feed.telegraph ? "on" : "off"}
                         variant="ghost"
                         isChecked={feed.telegraph}
@@ -353,11 +369,7 @@ export default function Test() {
                           w="2"
                           h="2"
                           border="1px"
-                          bg={feed.telegraph
-                            ? colorMode === "light"
-                              ? "black"
-                              : "white"
-                            : "transparent"}
+                          bg={feed.telegraph ? "green.500" : "red.500"}
                           borderRadius="full"
                         ></Box>
                       </Button>
