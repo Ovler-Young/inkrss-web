@@ -7,6 +7,13 @@ import {
   useToast,
   useDisclosure,
   useColorMode,
+  Editable,
+  EditableInput,
+  EditableTextarea,
+  EditablePreview,
+  Center,
+  Container,
+  Spacer,
   Table,
   Thead,
   Tbody,
@@ -46,8 +53,8 @@ export default function Test() {
   const [subtitle, setsubtitle] = useAtom(subAtom);
   const { data } = useSWR(`https://rssandmore.gcy.workers.dev/1/feeds`);
   React.useEffect(() => {
-    setdomain(location.host)
-    setsecret(location.pathname.substring(1))
+    setdomain(location.host);
+    setsecret(location.pathname.substring(1));
     setHasMounted(true);
   }, [setdomain, setsecret]);
   const handledelete = async (e) => {
@@ -182,13 +189,12 @@ export default function Test() {
     mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
   const handleTitle = async (e) => {
-    e.preventDefault();
     let url = e.currentTarget.getAttribute("url");
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/title`, {
       method: "post",
       body: JSON.stringify({
         url: url,
-        title: suburl,
+        title: subtitle,
       }),
     })
       .then((r) => r.json())
@@ -232,64 +238,76 @@ export default function Test() {
           <Text align="center" fontSize="2xl" fontWeight="bold">
             Subscribe!
           </Text>
-          <Box
-            w="md"
-            maxW="100%"
-            mx="auto"
-            my="3"
-            align="center"
-          >
-            <Text fontSize="md" fontWeight="light" align="center">
-              在下方输入串号
-            </Text>
-            <PinInput
-              size="md"
-              onChange={(value) => setsuburl(value) && console.log(suburl)}
-              onComplete={(value) => setsuburl(value) && console.log(suburl) && handlesub}
-              PinInput={true}
-            >
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-              <PinInputField/>
-            </PinInput>
-            <Button
-              size="md"
-              onClick={handlesub}
-              variant="outline"
-              colorScheme="black"
-            >
-              GO!
-            </Button>
-          </Box>
+          <flex>
+            <Box w="md" maxW="100%" mx="auto" my="3" align="center">
+              <Text fontSize="md" fontWeight="light" align="center">
+                在下方输入串号
+              </Text>
+            </Box>
+            <Flex size="sm">
+              <Box>
+                <PinInput
+                  size="md"
+                  onChange={(value) => setsuburl(value)}
+                  //  onComplete, do (value) => setsuburl(value) and handlesub()
+                  onComplete={(value) => setsuburl(value) & handlesub()}
+                  PinInput={true}
+                >
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                </PinInput>
+              </Box>
+                <Spacer />
+              <Box>
+                <Button
+                  size="md"
+                  onClick={handlesub}
+                  variant="outline"
+                  colorScheme="black"
+                >
+                  GO!
+                </Button>
+            </Box>
+            </Flex>
+          </flex>
           <Text align="center" fontSize="2xl">
             {data.length} items
           </Text>
-          <Table size="xs">
-            <Thead>
-              <Tr>
-                <Tooltip label="active" placement="auto">
-                  <Th>act</Th>
-                </Tooltip>
-                <Th>title</Th>
-                <Tooltip label="telegraph" placement="auto">
-                  <Th>TG</Th>
-                </Tooltip>
-                <Tooltip label="ReplyCount" placement="auto">
-                  <Th>RPL</Th>
-                </Tooltip>
-                <Tooltip label="ReplyCount" placement="auto">
-                  <Th>DEL</Th>
-                </Tooltip>
-               </Tr>
-            </Thead>
-            <Tbody>
-              {data.map((feed) => (
-                <Tr key={feed.url}>
+          <Center width="md">
+            <Table size="xs"  align="center"  w="md" maxW="100%" mx="auto" my="3" variant="simple">
+              <Thead>
+                <Tr>
+                  <Tooltip label="active" placement="auto">
+                    <Th>act</Th>
+                  </Tooltip>
+                  <Th>id</Th>
+                  <Th>title</Th>
+                  <Tooltip label="telegraph" placement="auto">
+                    <Th>TG</Th>
+                  </Tooltip>
+                  <Tooltip label="ReplyCount" placement="auto">
+                    <Th>RPL</Th>
+                  </Tooltip>
+                  <Tooltip label="Original Writer" placement="auto">
+                    <Th>PO</Th>
+                  </Tooltip>
+                  <Tooltip label="FIELD" placement="auto">
+                    <Th>FLD</Th>
+                  </Tooltip>
+                  <Tooltip label="Delete" placement="auto">
+                    <Th>DEL</Th>
+                  </Tooltip>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data.map((feed) => (
+                  <Tr key={feed.url}>
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
@@ -311,13 +329,26 @@ export default function Test() {
                     </Tooltip>
                   </Td>
                   <Td>
-                    <Popover placement="top-start">
+                    <Link href={feed.url} fontSize="s" fontWeight="light">{feed.id}</Link>
+                  </Td>
+                  <Td maxWidth="xs" overflowX="scroll">
+                    <Popover
+                     placement="top-start"
+                     bg="black"
+                     >
                       <PopoverTrigger>
-                          <Button variant="ghost" size="xs" fontSize="s" fontWeight="light">
-                            {feed.title}
-                          </Button>
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          fontSize="s"
+                          fontWeight="light"
+                        >
+                          {feed.title}
+                        </Button>
                       </PopoverTrigger>
-                      <PopoverContent boxShadow="black">
+                      <PopoverContent boxShadow="black" bg={
+                                colorMode === "light" ? "white" : "black"
+                              }>
                         <PopoverHeader fontWeight="semibold">
                           重命名标题！
                         </PopoverHeader>
@@ -325,11 +356,15 @@ export default function Test() {
                         <PopoverCloseButton />
                         <PopoverBody align="center">
                           <Text>请重新输入</Text>
-                          <Text  fontSize="xl" fontWeight="bold" align="center">{feed.title}</Text>
+                          <Text fontSize="xl" fontWeight="bold" align="center">
+                            {feed.title}
+                          </Text>
                           <Text>的标题！</Text>
                           <InputGroup size="sm">
                             <Input
-                              focusBorderColor={colorMode === "light" ? "black" : "black"}
+                              focusBorderColor={
+                                colorMode === "light" ? "black" : "white"
+                              }
                               pr="2rem"
                               placeholder="重新输入标题"
                               value={subtitle}
@@ -354,7 +389,6 @@ export default function Test() {
                       </PopoverContent>
                     </Popover>
                   </Td>
-
                   <Td>
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
@@ -375,8 +409,32 @@ export default function Test() {
                       </Button>
                     </Tooltip>
                   </Td>
+                  <Td isNumeric whiteSpace="pre"> {feed.ReplyCount } </Td>
                   <Td>
-                    <Link href={feed.url} fontSize="s" fontWeight="light">{feed.ReplyCount}</Link>
+                    <Link href={feed.url} fontSize="s" fontWeight="light">
+                      {feed.po}
+                    </Link>
+                  </Td>
+                  <Td>
+                    <Link
+                      href={feed.fid === 19
+                        ? "https://www.nmbxd1.com/f/小说"
+                        : feed.fid === 81
+                        ? "https://www.nmbxd1.com/f/怪谈"
+                        : feed.fid === 111
+                        ? "https://www.nmbxd1.com/f/跑团"
+                        : feed.fid}
+                      fontSize="s"
+                      fontWeight="light"
+                      >
+                      {feed.fid === 19
+                        ? "小说"
+                        : feed.fid === 81
+                        ? "怪谈"
+                        : feed.fid === 111
+                        ? "跑团"
+                        : feed.fid}
+                    </Link>
                   </Td>
                   <Td>
                     <Popover placement="top-start" colorScheme="black">
@@ -407,10 +465,11 @@ export default function Test() {
                       </PopoverContent>
                     </Popover>
                   </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Center>
         </Box>
       </Box>
       <footer>
