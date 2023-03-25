@@ -154,40 +154,6 @@ export default function Test() {
       });
     mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
-  const handleTelegraph = async (e) => {
-    e.preventDefault();
-    console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/telegraph`, {
-      method: "POST",
-      body: JSON.stringify({
-        url: e.currentTarget.getAttribute("url"),
-        state: e.currentTarget.getAttribute("state") === "on" ? false : true,
-      }),
-    })
-      .then((r) => r.json())
-      .then((r) => {
-        if (r.status != 0) {
-          toast({
-            position: "bottom-right",
-            title: "Error!",
-            description: r.message,
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            position: "bottom-right",
-            title: "succeed!",
-            description: r.message,
-            status: "success",
-            duration: 1000,
-            isClosable: true,
-          });
-        }
-      });
-    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
-  };
   const handleTitle = async (e) => {
     let url = e.currentTarget.getAttribute("url");
     const res = await fetch(`https://rssandmore.gcy.workers.dev/1/title`, {
@@ -221,6 +187,46 @@ export default function Test() {
       });
     mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
   };
+  const handleUnread = async (e) => {
+    e.preventDefault();
+    console.log(e.currentTarget.getAttribute("state"));
+    console.log(e.currentTarget.getAttribute("jump"));
+    window.open(e.currentTarget.getAttribute("jump"));
+    const res = await fetch(`https://rssandmore.gcy.workers.dev/1/unread`, {
+      method: "POST",
+      body: JSON.stringify({
+        url: e.currentTarget.getAttribute("url"),
+      }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.status != 0) {
+          toast({
+            position: "bottom-right",
+            title: "Error!",
+            description: r.message,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            position: "bottom-right",
+            title: "succeed!",
+            description: r.message,
+            status: "success",
+            duration: 1000,
+            isClosable: true,
+          });
+        }
+      });
+    mutate(`https://rssandmore.gcy.workers.dev/1/feeds`);
+  };
+  const handleJump = async (e) => {
+    e.preventDefault();
+    console.log(e.currentTarget.getAttribute("url"));
+    window.open(e.currentTarget.getAttribute("url"));
+  };
   if (!data || !hasMounted) {
     return (
       <Box w="100%" align="center">
@@ -244,14 +250,14 @@ export default function Test() {
                 在下方输入串号
               </Text>
             </Box>
-            <Flex size="sm">
-              <Box>
+            <Box size="sm" align="center">
                 <PinInput
                   size="md"
                   onChange={(value) => setsuburl(value)}
                   //  onComplete, do (value) => setsuburl(value) and handlesub()
                   onComplete={(value) => setsuburl(value) & handlesub()}
                   PinInput={true}
+                  align="center"
                 >
                   <PinInputField />
                   <PinInputField />
@@ -262,19 +268,8 @@ export default function Test() {
                   <PinInputField />
                   <PinInputField />
                 </PinInput>
-              </Box>
-                <Spacer />
-              <Box>
-                <Button
-                  size="md"
-                  onClick={handlesub}
-                  variant="outline"
-                  colorScheme="black"
-                >
-                  GO!
-                </Button>
             </Box>
-            </Flex>
+                <Spacer />
           </flex>
           <Text align="center" fontSize="2xl">
             {data.length} items
@@ -283,20 +278,18 @@ export default function Test() {
             <Table size="xs"  align="center"  w="md" maxW="100%" mx="auto" my="3" variant="simple">
               <Thead>
                 <Tr>
+                <Tooltip label="Unread" placement="auto">
+                    <Th>URD</Th>
+                  </Tooltip>
+                  <Th>title</Th>
                   <Tooltip label="active" placement="auto">
                     <Th>act</Th>
-                  </Tooltip>
-                  <Th>id</Th>
-                  <Th>title</Th>
-                  <Tooltip label="telegraph" placement="auto">
-                    <Th>TG</Th>
-                  </Tooltip>
-                  <Tooltip label="ReplyCount" placement="auto">
-                    <Th>RPL</Th>
                   </Tooltip>
                   <Tooltip label="Original Writer" placement="auto">
                     <Th>PO</Th>
                   </Tooltip>
+                  <Th>ID</Th>
+                  <Th>UPD</Th>
                   <Tooltip label="FIELD" placement="auto">
                     <Th>FLD</Th>
                   </Tooltip>
@@ -308,33 +301,42 @@ export default function Test() {
               <Tbody>
                 {data.map((feed) => (
                   <Tr key={feed.url}>
-                  <Td>
-                    <Tooltip label="Click to change!" placement="auto">
-                      <Button
-                        id={feed.id}
-                        state={feed.active ? "on" : "off"}
-                        variant="ghost"
-                        isChecked={feed.active}
-                        onClick={handleActive}
-                        url={feed.url}
-                      >
-                        <Box
-                          w="2"
-                          h="2"
-                          border="1px"
-                          bg={feed.active ? "green.500" : "red.500"}
-                          borderRadius="full"
-                        ></Box>
-                      </Button>
-                    </Tooltip>
+                  <Td> 
+                    {feed.unread 
+                    ? <Tooltip label="Mark as read!" placement="auto">
+                        <Button
+                          id={feed.id}
+                          url={feed.url}
+                          state={feed.unread ? "on" : "off"}
+                          variant="ghost"
+                          isChecked={feed.unread}
+                          jump={feed.unread
+                            ? `https://www.nmbxd1.com/m/t/${feed.id}?page=${Math.floor((feed.LastRead - 1) / 9 + 1)}`
+                            : `https://www.nmbxd1.com/m/t/${feed.id}?page=${Math.floor((feed.ReplyCountAll - 1) / 9 + 1)}`
+                          }
+                          onClick={handleUnread}
+                        > {feed.unread}
+                        </Button>
+                      </Tooltip>
+                    : <Tooltip label="No action!" placement="auto">
+                    <Button
+                      id={feed.id}
+                      url={feed.unread
+                        ? `https://www.nmbxd1.com/m/t/${feed.id}?page=${Math.floor((feed.LastRead - 1) / 9 + 1)}`
+                        : `https://www.nmbxd1.com/m/t/${feed.id}?page=${Math.floor((feed.ReplyCountAll - 1) / 9 + 1)}`
+                      }
+                      variant="ghost"
+                      isChecked={feed.unread}
+                      onClick={handleJump}
+                    > {feed.unread}
+                    </Button>
+                  </Tooltip>}
                   </Td>
-                  <Td>
-                    <Link href={feed.url} fontSize="s" fontWeight="light">{feed.id}</Link>
-                  </Td>
-                  <Td maxWidth="xs" overflowX="scroll">
+                  <Td maxWidth="14em" overflowX="scroll">
                     <Popover
                      placement="top-start"
                      bg="black"
+                     size="xs"
                      >
                       <PopoverTrigger>
                         <Button
@@ -393,27 +395,46 @@ export default function Test() {
                     <Tooltip label="Click to change!" placement="auto">
                       <Button
                         id={feed.id}
-                        url={feed.url}
-                        state={feed.telegraph ? "on" : "off"}
+                        state={feed.active ? "on" : "off"}
                         variant="ghost"
-                        isChecked={feed.telegraph}
-                        onClick={handleTelegraph}
+                        isChecked={feed.active}
+                        onClick={handleActive}
+                        url={feed.url}
                       >
                         <Box
                           w="2"
                           h="2"
                           border="1px"
-                          bg={feed.telegraph ? "green.500" : "red.500"}
+                          bg={feed.active ? "green.500" : "red.500"}
                           borderRadius="full"
                         ></Box>
                       </Button>
                     </Tooltip>
                   </Td>
-                  <Td isNumeric whiteSpace="pre"> {feed.ReplyCount } </Td>
                   <Td>
                     <Link href={feed.url} fontSize="s" fontWeight="light">
-                      {feed.po}
+                      {feed.po.substring(0, 3)}
                     </Link>
+                  </Td>
+                  <Td>
+                    <Button
+                      id={feed.id}
+                      url={feed.unread
+                        ? `https://www.nmbxd1.com/t/${feed.id}?page=${Math.floor((feed.LastRead - 1) / 19 + 1)}`
+                        : `https://www.nmbxd1.com/t/${feed.id}?page=${Math.floor((feed.ReplyCountAll - 1) / 19 + 1)}`
+                      }
+                      variant="ghost"
+                      fontWeight="light"
+                      herf={feed.url}
+                      // on click jump to the url
+                      onClick={handleJump}
+                      size="xs"
+                      fontSize="md"
+                    >{feed.id}
+                    </Button>
+                  </Td>
+                  <Td fontSize="sm">
+                    {feed.lastUpdateTime.substring(5, 7)}/{feed.lastUpdateTime.substring(8, 10)}|{feed.lastUpdateTime.substring(13, 15)}:{feed.lastUpdateTime.substring(16, 18)}
                   </Td>
                   <Td>
                     <Link
@@ -423,7 +444,14 @@ export default function Test() {
                         ? "https://www.nmbxd1.com/f/怪谈"
                         : feed.fid === 111
                         ? "https://www.nmbxd1.com/f/跑团"
-                        : feed.fid}
+                        : feed.fid === 4
+                        ? "https://www.nmbxd1.com/f/综合版1"
+                        : feed.fid === 20
+                        ? "https://www.nmbxd1.com/f/都市怪谈"
+                        : feed.fid === 112
+                        ? "https://www.nmbxd1.com/f/ROLL点"
+                        : feed.fid
+                      }
                       fontSize="s"
                       fontWeight="light"
                       >
@@ -433,7 +461,14 @@ export default function Test() {
                         ? "怪谈"
                         : feed.fid === 111
                         ? "跑团"
-                        : feed.fid}
+                        : feed.fid === 4
+                        ? "中医"
+                        : feed.fid === 20
+                        ? "怪谈"
+                        : feed.fid === 112
+                        ? "R 点"
+                        : feed.fid
+                      }
                     </Link>
                   </Td>
                   <Td>
@@ -443,7 +478,9 @@ export default function Test() {
                           Delete
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent boxShadow="black">
+                      <PopoverContent boxShadow="black" bg={
+                                colorMode === "light" ? "white" : "black"
+                              }>
                         <PopoverHeader fontWeight="semibold">
                           Be careful!
                         </PopoverHeader>
